@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title}">Secure File Sharing</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Cybersecurity Color Palette - Same as index.html */
+        --primary-bg: #0a0a0a;
+        --secondary-bg: #111111;
+        --card-bg: rgba(15, 15, 25, 0.9);
+        --accent-neon: #00ff41;
+        --accent-blue: #00d4ff;
+        --accent-purple: #8b5cf6;
+        --accent-red: #ff3366;
+        --accent-orange: #ff9800;
+        --accent-yellow: #ffd700;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --text-muted: #707070;
+        --border-glow: rgba(0, 255, 65, 0.3);
+        --shadow-neon: 0 0 20px rgba(0, 255, 65, 0.2);
+        --grid-color: rgba(0, 255, 65, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Orbitron", "Courier Prime", monospace;
+        background: var(--primary-bg);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Animated Background Grid - Same as index.html */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(
+            rgba(0, 255, 65, 0.03) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      /* Floating particles effect - Same as index.html */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            2px 2px at 20px 30px,
+            var(--accent-neon),
+            transparent
+          ),
+          radial-gradient(2px 2px at 40px 70px, var(--accent-blue), transparent),
+          radial-gradient(
+            1px 1px at 90px 40px,
+            var(--accent-purple),
+            transparent
+          );
+        background-size: 200px 200px;
+        animation: float 15s ease-in-out infinite;
+        opacity: 0.1;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .nav {
+        margin-bottom: 30px;
+        padding: 15px 0;
+      }
+
+      .nav a {
+        color: var(--accent-neon);
+        text-decoration: none;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-glow);
+        padding: 10px 20px;
+        border-radius: 8px;
+        background: rgba(0, 255, 65, 0.05);
+        display: inline-block;
+        box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+      }
+
+      .nav a:hover {
+        color: var(--primary-bg);
+        background: var(--accent-neon);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 65, 0.4);
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 50px;
+        position: relative;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 60%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-red),
+          transparent
+        );
+        animation: scanLine 3s ease-in-out infinite;
+      }
+
+      @keyframes scanLine {
+        0%,
+        100% {
+          opacity: 0;
+          width: 0%;
+        }
+        50% {
+          opacity: 1;
+          width: 60%;
+        }
+      }
+
+      .header h1 {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px var(--accent-red), 0 0 20px var(--accent-red),
+          0 0 30px var(--accent-red);
+        animation: titleGlow 4s ease-in-out infinite alternate;
+        letter-spacing: 2px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-red),
+          var(--accent-orange)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      @keyframes titleGlow {
+        from {
+          text-shadow: 0 0 1px var(--accent-red), 0 0 1px var(--accent-red),
+            0 0 10px var(--accent-red);
+        }
+        to {
+          text-shadow: 0 0 1px var(--accent-red), 0 0 1px var(--accent-red),
+            0 0 1px var(--accent-red);
+        }
+      }
+
+      .header p {
+        font-size: clamp(1rem, 2vw, 1.2rem);
+        color: var(--text-secondary);
+        font-family: "Courier Prime", monospace;
+        font-weight: 400;
+      }
+
+      .warning-box {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.1),
+          rgba(255, 152, 0, 0.1)
+        );
+        border: 2px solid var(--accent-orange);
+        padding: 20px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 0 25px rgba(255, 152, 0, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .warning-box strong {
+        color: var(--accent-orange);
+        font-family: "Orbitron", monospace;
+        text-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+      }
+
+      .upload-section,
+      .files-section {
+        background: var(--card-bg);
+        padding: 40px 35px;
+        border-radius: 20px;
+        backdrop-filter: blur(15px);
+        margin-bottom: 40px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(255, 51, 102, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .upload-section::before,
+      .files-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-red),
+          var(--accent-orange),
+          var(--accent-yellow)
+        );
+        animation: formBorder 3s ease-in-out infinite;
+      }
+
+      @keyframes formBorder {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .upload-section h3,
+      .files-section h3 {
+        font-family: "Orbitron", monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: var(--accent-red);
+        text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+      }
+
+      .upload-form {
+        display: grid;
+        gap: 25px;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .form-group label {
+        margin-bottom: 12px;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        color: var(--accent-red);
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+      }
+
+      .form-group input,
+      .form-group textarea,
+      .form-group select {
+        padding: 18px 20px;
+        border: 2px solid rgba(255, 51, 102, 0.3);
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: "Courier Prime", monospace;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-primary);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--accent-red);
+        box-shadow: 0 0 20px rgba(255, 51, 102, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+        color: var(--text-muted);
+      }
+
+      .form-group textarea {
+        resize: vertical;
+        height: 100px;
+        font-family: "Courier Prime", monospace;
+      }
+
+      .file-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 150px;
+        border: 3px dashed rgba(255, 51, 102, 0.4);
+        border-radius: 15px;
+        background: rgba(255, 51, 102, 0.05);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .file-input-container:hover {
+        border-color: var(--accent-red);
+        background: rgba(255, 51, 102, 0.1);
+        box-shadow: 0 0 20px rgba(255, 51, 102, 0.2);
+      }
+
+      .file-input-container.dragover {
+        border-color: var(--accent-neon);
+        background: rgba(0, 255, 65, 0.1);
+        box-shadow: 0 0 25px rgba(0, 255, 65, 0.3);
+      }
+
+      .file-input-container input[type="file"] {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .file-input-text {
+        text-align: center;
+        color: var(--text-secondary);
+        font-family: "Courier Prime", monospace;
+        padding: 20px;
+      }
+
+      .file-input-text.has-file {
+        color: var(--accent-neon);
+        font-weight: 700;
+      }
+
+      .file-input-text div {
+        font-size: 1.1rem;
+        margin-bottom: 8px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 25px;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, var(--accent-red), #c62828);
+        color: var(--text-primary);
+        padding: 18px 35px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        text-align: center;
+        box-shadow: 0 0 25px rgba(255, 51, 102, 0.4),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #ff3366, var(--accent-orange));
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(255, 51, 102, 0.5),
+          0 0 40px rgba(255, 51, 102, 0.6),
+          inset 0 0 25px rgba(255, 255, 255, 0.2);
+      }
+
+      .btn:disabled {
+        background: rgba(102, 102, 102, 0.8);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btn-secondary {
+        background: linear-gradient(135deg, var(--accent-orange), #e65100);
+      }
+
+      .btn-secondary:hover {
+        background: linear-gradient(135deg, #ff9800, var(--accent-yellow));
+      }
+
+      .btn-small {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+      }
+
+      .upload-progress {
+        width: 100%;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        overflow: hidden;
+        margin: 20px 0;
+        display: none;
+        border: 1px solid rgba(255, 51, 102, 0.3);
+      }
+
+      .upload-progress-bar {
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          var(--accent-red),
+          var(--accent-orange)
+        );
+        width: 0%;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+      }
+
+      .success-result {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 255, 65, 0.15),
+          rgba(0, 204, 51, 0.1)
+        );
+        border: 2px solid var(--accent-neon);
+        padding: 25px;
+        border-radius: 15px;
+        margin-top: 25px;
+        display: none;
+        box-shadow: 0 0 30px rgba(0, 255, 65, 0.3);
+        backdrop-filter: blur(10px);
+      }
+
+      .success-result h4 {
+        font-family: "Orbitron", monospace;
+        color: var(--accent-neon);
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+      }
+
+      .error-result {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 51, 102, 0.15),
+          rgba(183, 28, 28, 0.1)
+        );
+        border: 2px solid var(--accent-red);
+        padding: 25px;
+        border-radius: 15px;
+        margin-top: 25px;
+        display: none;
+        box-shadow: 0 0 30px rgba(255, 51, 102, 0.3);
+        backdrop-filter: blur(10px);
+      }
+
+      .error-result h4 {
+        font-family: "Orbitron", monospace;
+        color: var(--accent-red);
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px rgba(255, 51, 102, 0.5);
+      }
+
+      .share-link {
+        background: rgba(0, 255, 65, 0.1);
+        color: var(--text-primary);
+        padding: 15px;
+        border-radius: 10px;
+        margin: 15px 0;
+        font-family: "Courier Prime", monospace;
+        word-break: break-all;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid rgba(0, 255, 65, 0.3);
+      }
+
+      .copy-btn {
+        background: var(--accent-blue);
+        color: var(--primary-bg);
+        border: none;
+        padding: 10px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-family: "Orbitron", monospace;
+        font-weight: 700;
+        margin-left: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+      }
+
+      .copy-btn:hover {
+        background: #00d4ff;
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+      }
+
+      .files-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        margin-top: 25px;
+      }
+
+      .file-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+          inset 0 0 20px rgba(255, 255, 255, 0.02);
+      }
+
+      .file-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-glow);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4),
+          0 0 30px rgba(0, 255, 65, 0.2);
+      }
+
+      .file-card.expired {
+        opacity: 0.7;
+        border-color: var(--accent-red);
+        background: rgba(255, 51, 102, 0.05);
+      }
+
+      .file-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .file-name {
+        font-family: "Orbitron", monospace;
+        font-weight: 700;
+        color: var(--accent-red);
+        word-break: break-word;
+        flex: 1;
+        font-size: 1.1rem;
+        text-shadow: 0 0 10px rgba(255, 51, 102, 0.3);
+      }
+
+      .file-status {
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        margin-left: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .status-active {
+        background: linear-gradient(135deg, var(--accent-neon), #00cc33);
+        color: var(--primary-bg);
+        box-shadow: 0 0 15px rgba(0, 255, 65, 0.3);
+      }
+
+      .status-expired {
+        background: linear-gradient(135deg, var(--accent-red), #c62828);
+        color: white;
+        box-shadow: 0 0 15px rgba(255, 51, 102, 0.3);
+      }
+
+      .status-limited {
+        background: linear-gradient(135deg, var(--accent-orange), #e65100);
+        color: white;
+        box-shadow: 0 0 15px rgba(255, 152, 0, 0.3);
+      }
+
+      .file-details {
+        margin: 15px 0;
+        font-family: "Courier Prime", monospace;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .file-details div {
+        margin: 8px 0;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 6px;
+        border-left: 3px solid var(--accent-blue);
+      }
+
+      .file-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+      }
+
+      .files-section > div:first-of-type {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px 15px;
+        }
+
+        .files-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .upload-section,
+        .files-section {
+          padding: 25px 20px;
+        }
+
+        .file-header {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .file-status {
+          margin-left: 0;
+          align-self: flex-start;
+        }
+      }
+
+      /* Accessibility improvements */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        :root {
+          --text-primary: #ffffff;
+          --text-secondary: #ffffff;
+          --border-glow: #ffffff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav">
+        <a href="/">← Back to Home</a>
+      </div>
+
+      <div class="header">
+        <h1>📁 Secure File Sharing</h1>
+        <p>
+          Upload files securely with encryption, password protection, and expiry
+          controls
+        </p>
+      </div>
+
+      <div class="warning-box">
+        <strong>🔒 Security Features:</strong> Files are stored securely with
+        optional password protection, download limits, and automatic expiry.
+        Maximum file size: 100MB per file.
+      </div>
+
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h3>📤 Upload File</h3>
+        <form id="uploadForm" class="upload-form">
+          <div class="form-group">
+            <label>Select File</label>
+            <div class="file-input-container" id="fileInputContainer">
+              <input type="file" id="fileInput" accept="*/*" required />
+              <div class="file-input-text" id="fileInputText">
+                <div>📁 Click to select file or drag & drop</div>
+                <small>Maximum size: 100MB</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description (Optional)</label>
+            <textarea
+              id="description"
+              placeholder="Brief description of the file..."
+            ></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="password">Password Protection (Optional)</label>
+              <input
+                type="password"
+                id="password"
+                placeholder="Leave empty for no password"
+              />
+            </div>
+            <div class="form-group">
+              <label for="maxDownloads">Download Limit (Optional)</label>
+              <select id="maxDownloads">
+                <option value="">No limit</option>
+                <option value="1">1 download</option>
+                <option value="5">5 downloads</option>
+                <option value="10">10 downloads</option>
+                <option value="25">25 downloads</option>
+                <option value="50">50 downloads</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="expiryHours">File Expiry (Optional)</label>
+            <select id="expiryHours">
+              <option value="">Never expires</option>
+              <option value="1">1 hour</option>
+              <option value="6">6 hours</option>
+              <option value="24">24 hours</option>
+              <option value="72">3 days</option>
+              <option value="168">1 week</option>
+              <option value="720">30 days</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn">🚀 Upload & Share File</button>
+
+          <div class="upload-progress" id="uploadProgress">
+            <div class="upload-progress-bar" id="uploadProgressBar"></div>
+          </div>
+        </form>
+
+        <div id="successResult" class="success-result">
+          <!-- Success content will be populated here -->
+        </div>
+
+        <div id="errorResult" class="error-result">
+          <!-- Error content will be populated here -->
+        </div>
+      </div>
+
+      <!-- My Files Section -->
+      <div class="files-section">
+        <div>
+          <h3>📋 My Uploaded Files</h3>
+          <button class="btn btn-secondary btn-small" onclick="loadMyFiles()">
+            🔄 Refresh
+          </button>
+        </div>
+
+        <div id="myFilesContainer">
+          <p>Click refresh to load your uploaded files...</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // File input handling
+      const fileInput = document.getElementById("fileInput");
+      const fileInputContainer = document.getElementById("fileInputContainer");
+      const fileInputText = document.getElementById("fileInputText");
+
+      fileInput.addEventListener("change", handleFileSelect);
+      fileInputContainer.addEventListener("dragover", handleDragOver);
+      fileInputContainer.addEventListener("dragleave", handleDragLeave);
+      fileInputContainer.addEventListener("drop", handleDrop);
+
+      function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+          updateFileInputText(file);
+        }
+      }
+
+      function handleDragOver(event) {
+        event.preventDefault();
+        fileInputContainer.classList.add("dragover");
+      }
+
+      function handleDragLeave(event) {
+        event.preventDefault();
+        fileInputContainer.classList.remove("dragover");
+      }
+
+      function handleDrop(event) {
+        event.preventDefault();
+        fileInputContainer.classList.remove("dragover");
+
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          fileInput.files = files;
+          updateFileInputText(files[0]);
+        }
+      }
+
+      function updateFileInputText(file) {
+        const sizeText = formatFileSize(file.size);
+        fileInputText.innerHTML = `
+                <div class="has-file">✅ ${file.name}</div>
+                <small>Size: ${sizeText} | Type: ${
+          file.type || "Unknown"
+        }</small>
+            `;
+        fileInputText.classList.add("has-file");
+      }
+
+      function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + " B";
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+        if (bytes < 1024 * 1024 * 1024)
+          return (bytes / (1024 * 1024)).toFixed(1) + " MB";
+        return (bytes / (1024 * 1024 * 1024)).toFixed(1) + " GB";
+      }
+
+      // Form submission
+      document
+        .getElementById("uploadForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const fileInput = document.getElementById("fileInput");
+          if (!fileInput.files[0]) {
+            alert("Please select a file to upload");
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", fileInput.files[0]);
+
+          const description = document.getElementById("description").value;
+          if (description) formData.append("description", description);
+
+          const password = document.getElementById("password").value;
+          if (password) formData.append("password", password);
+
+          const maxDownloads = document.getElementById("maxDownloads").value;
+          if (maxDownloads) formData.append("maxDownloads", maxDownloads);
+
+          const expiryHours = document.getElementById("expiryHours").value;
+          if (expiryHours) formData.append("expiryHours", expiryHours);
+
+          // Show progress
+          document.getElementById("uploadProgress").style.display = "block";
+          document.querySelector('button[type="submit"]').disabled = true;
+          document.querySelector('button[type="submit"]').textContent =
+            "📤 Uploading...";
+
+          try {
+            const response = await fetch("/api/files/upload", {
+              method: "POST",
+              body: formData,
+            });
+
+            const result = await response.json();
+
+            if (result.status === "success") {
+              showSuccess(result);
+              document.getElementById("uploadForm").reset();
+              resetFileInput();
+              loadMyFiles(); // Refresh file list
+            } else {
+              showError(result.message);
+            }
+          } catch (error) {
+            showError("Upload failed: " + error.message);
+          } finally {
+            document.getElementById("uploadProgress").style.display = "none";
+            document.querySelector('button[type="submit"]').disabled = false;
+            document.querySelector('button[type="submit"]').textContent =
+              "🚀 Upload & Share File";
+          }
+        });
+
+      function resetFileInput() {
+        fileInputText.innerHTML = `
+                <div>📁 Click to select file or drag & drop</div>
+                <small>Maximum size: 100MB</small>
+            `;
+        fileInputText.classList.remove("has-file");
+      }
+
+      function showSuccess(result) {
+        const successDiv = document.getElementById("successResult");
+        const fullUrl = window.location.origin + result.shareUrl;
+
+        successDiv.innerHTML = `
+                <h4>✅ File Uploaded Successfully!</h4>
+                <p><strong>File:</strong> ${result.fileName} (${
+          result.fileSize
+        })</p>
+                <p><strong>Share Link:</strong></p>
+                <div class="share-link">
+                    <span>${fullUrl}</span>
+                    <button class="copy-btn" onclick="copyToClipboard('${fullUrl}')">📋 Copy</button>
+                </div>
+                <p><small>
+                    ${result.hasPassword ? "🔒 Password protected | " : ""}
+                    ${
+                      result.maxDownloads
+                        ? `📊 Max downloads: ${result.maxDownloads} | `
+                        : ""
+                    }
+                    ${
+                      result.expiryTime
+                        ? `⏰ Expires: ${new Date(
+                            result.expiryTime
+                          ).toLocaleString()}`
+                        : "♾️ Never expires"
+                    }
+                </small></p>
+            `;
+        successDiv.style.display = "block";
+
+        // Hide after 30 seconds
+        setTimeout(() => {
+          successDiv.style.display = "none";
+        }, 30000);
+      }
+
+      function showError(message) {
+        const errorDiv = document.getElementById("errorResult");
+        errorDiv.innerHTML = `<h4>❌ Upload Failed</h4><p>${message}</p>`;
+        errorDiv.style.display = "block";
+
+        // Hide after 10 seconds
+        setTimeout(() => {
+          errorDiv.style.display = "none";
+        }, 10000);
+      }
+
+      function copyToClipboard(text) {
+        navigator.clipboard
+          .then(() => {
+            return navigator.clipboard.writeText(text);
+          })
+          .then(() => {
+            alert("Link copied to clipboard!");
+          })
+          .catch(() => {
+            // Fallback for older browsers
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand("copy");
+            document.body.removeChild(textArea);
+            alert("Link copied to clipboard!");
+          });
+      }
+
+      // Load user files
+      async function loadMyFiles() {
+        try {
+          const response = await fetch("/api/files/my-files");
+          const files = await response.json();
+          displayMyFiles(files);
+        } catch (error) {
+          document.getElementById("myFilesContainer").innerHTML =
+            "<p>Error loading files: " + error.message + "</p>";
+        }
+      }
+
+      function displayMyFiles(files) {
+        const container = document.getElementById("myFilesContainer");
+
+        if (files.length === 0) {
+          container.innerHTML =
+            "<p>No files uploaded yet. Upload your first file above!</p>";
+          return;
+        }
+
+        let html = '<div class="files-grid">';
+
+        files.forEach((file) => {
+          const isExpired = file.isExpired;
+          const isLimited =
+            file.maxDownloads > 0 && file.currentDownloads >= file.maxDownloads;
+          const status = isExpired
+            ? "expired"
+            : isLimited
+            ? "limited"
+            : "active";
+          const statusText = isExpired
+            ? "Expired"
+            : isLimited
+            ? "Limit Reached"
+            : "Active";
+          const statusClass = isExpired
+            ? "status-expired"
+            : isLimited
+            ? "status-limited"
+            : "status-active";
+
+          html += `
+                    <div class="file-card ${
+                      isExpired || isLimited ? "expired" : ""
+                    }">
+                        <div class="file-header">
+                            <div class="file-name">${file.fileName}</div>
+                            <div class="file-status ${statusClass}">${statusText}</div>
+                        </div>
+                        
+                        <div class="file-details">
+                            <div>📊 Size: ${file.fileSize}</div>
+                            <div>📥 Downloads: ${file.currentDownloads}${
+            file.maxDownloads > 0 ? ` / ${file.maxDownloads}` : ""
+          }</div>
+                            <div>📅 Uploaded: ${new Date(
+                              file.uploadTime
+                            ).toLocaleString()}</div>
+                            ${
+                              file.expiryTime
+                                ? `<div>⏰ Expires: ${new Date(
+                                    file.expiryTime
+                                  ).toLocaleString()}</div>`
+                                : "<div>♾️ Never expires</div>"
+                            }
+                            ${
+                              file.hasPassword
+                                ? "<div>🔒 Password protected</div>"
+                                : ""
+                            }
+                            ${
+                              file.description
+                                ? `<div>📝 ${file.description}</div>`
+                                : ""
+                            }
+                        </div>
+                        
+                        <div class="file-actions">
+                            ${
+                              file.isActive
+                                ? `<button class="btn btn-small" onclick="copyToClipboard('${window.location.origin}/download/${file.shareToken}')">📋 Copy Link</button>`
+                                : '<button class="btn btn-small" disabled>❌ Unavailable</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+        });
+
+        html += "</div>";
+        container.innerHTML = html;
+      }
+
+      // Load files on page load
+      loadMyFiles();
+    </script>
+  </body>
+</html>

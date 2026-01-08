@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title}">CyberSecureX</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Courier+Prime:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Cybersecurity Color Palette */
+        --primary-bg: #0a0a0a;
+        --secondary-bg: #111111;
+        --card-bg: rgba(15, 15, 25, 0.9);
+        --accent-neon: #00ff41;
+        --accent-blue: #00d4ff;
+        --accent-purple: #8b5cf6;
+        --accent-red: #ff3366;
+        --text-primary: #ffffff;
+        --text-secondary: #b0b0b0;
+        --text-muted: #707070;
+        --border-glow: rgba(0, 255, 65, 0.3);
+        --shadow-neon: 0 0 20px rgba(0, 255, 65, 0.2);
+        --grid-color: rgba(0, 255, 65, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Orbitron", "Courier Prime", monospace;
+        background: var(--primary-bg);
+        color: var(--text-primary);
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+      }
+
+      /* Animated Background Grid */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: linear-gradient(
+            rgba(0, 255, 65, 0.03) 1px,
+            transparent 1px
+          ),
+          linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+        background-size: 50px 50px;
+        animation: gridMove 20s linear infinite;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes gridMove {
+        0% {
+          transform: translate(0, 0);
+        }
+        100% {
+          transform: translate(50px, 50px);
+        }
+      }
+
+      /* Floating particles effect */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            2px 2px at 20px 30px,
+            var(--accent-neon),
+            transparent
+          ),
+          radial-gradient(2px 2px at 40px 70px, var(--accent-blue), transparent),
+          radial-gradient(
+            1px 1px at 90px 40px,
+            var(--accent-purple),
+            transparent
+          );
+        background-size: 200px 200px;
+        animation: float 15s ease-in-out infinite;
+        opacity: 0.1;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-20px) rotate(180deg);
+        }
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 40px 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .header {
+        text-align: center;
+        margin-bottom: 60px;
+        position: relative;
+      }
+
+      .header::before {
+        content: "";
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80%;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--accent-neon),
+          transparent
+        );
+        animation: scanLine 3s ease-in-out infinite;
+      }
+
+      @keyframes scanLine {
+        0%,
+        100% {
+          opacity: 0;
+          width: 0%;
+        }
+        50% {
+          opacity: 1;
+          width: 80%;
+        }
+      }
+
+      .header h1 {
+        font-family: "Orbitron", monospace;
+        font-size: clamp(2rem, 5vw, 4rem);
+        font-weight: 900;
+        margin-bottom: 15px;
+        text-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-neon),
+          0 0 30px var(--accent-neon);
+        animation: titleGlow 4s ease-in-out infinite alternate;
+        letter-spacing: 2px;
+      }
+
+      @keyframes titleGlow {
+        from {
+          text-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-neon),
+            0 0 30px var(--accent-neon);
+        }
+        to {
+          text-shadow: 0 0 15px var(--accent-neon), 0 0 25px var(--accent-neon),
+            0 0 35px var(--accent-neon);
+        }
+      }
+
+      .header p {
+        font-size: clamp(1rem, 2vw, 1.3rem);
+        color: var(--text-secondary);
+        margin-bottom: 30px;
+        font-family: "Courier Prime", monospace;
+        font-weight: 400;
+      }
+
+      .status {
+        background: linear-gradient(
+          135deg,
+          rgba(0, 255, 65, 0.1),
+          rgba(0, 212, 255, 0.05)
+        );
+        padding: 25px 30px;
+        border-radius: 15px;
+        margin: 30px 0;
+        text-align: center;
+        border: 2px solid var(--border-glow);
+        box-shadow: var(--shadow-neon), inset 0 0 20px rgba(0, 255, 65, 0.05);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .status::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(0, 255, 65, 0.1),
+          transparent
+        );
+        animation: statusScan 2s linear infinite;
+      }
+
+      @keyframes statusScan {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .status strong {
+        color: var(--accent-neon);
+        font-size: 1.2rem;
+        text-shadow: 0 0 10px var(--accent-neon);
+      }
+
+      .status small {
+        color: var(--text-secondary);
+        font-family: "Courier Prime", monospace;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 60px;
+      }
+
+      .feature-card {
+        background: var(--card-bg);
+        padding: 35px 25px;
+        border-radius: 20px;
+        text-align: center;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+          inset 0 0 20px rgba(255, 255, 255, 0.02);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          var(--accent-neon),
+          var(--accent-blue),
+          var(--accent-purple)
+        );
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.4s ease;
+      }
+
+      .feature-card:hover::before {
+        transform: scaleX(1);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-15px) scale(1.02);
+        background: rgba(15, 15, 35, 0.95);
+        border-color: var(--border-glow);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4),
+          0 0 30px rgba(0, 255, 65, 0.2), inset 0 0 30px rgba(0, 255, 65, 0.05);
+      }
+
+      .feature-card h3 {
+        font-family: "Orbitron", monospace;
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        background: linear-gradient(
+          135deg,
+          var(--accent-neon),
+          var(--accent-blue)
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: none;
+      }
+
+      .feature-card p {
+        margin-bottom: 25px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+        font-family: "Courier Prime", monospace;
+      }
+
+      .btn {
+        background: linear-gradient(135deg, var(--accent-neon), #00cc33);
+        color: var(--primary-bg);
+        padding: 14px 30px;
+        text-decoration: none;
+        border-radius: 10px;
+        display: inline-block;
+        font-weight: 700;
+        font-family: "Orbitron", monospace;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.3),
+          inset 0 0 20px rgba(255, 255, 255, 0.1);
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.2),
+          transparent
+        );
+        transition: left 0.5s ease;
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:hover {
+        background: linear-gradient(135deg, #00ff41, var(--accent-blue));
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 255, 65, 0.4),
+          0 0 30px rgba(0, 255, 65, 0.5),
+          inset 0 0 20px rgba(255, 255, 255, 0.2);
+      }
+
+      .tech-info {
+        background: linear-gradient(
+          135deg,
+          var(--card-bg),
+          rgba(139, 92, 246, 0.05)
+        );
+        padding: 40px 30px;
+        border-radius: 20px;
+        margin-top: 60px;
+        text-align: center;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(139, 92, 246, 0.1);
+        position: relative;
+      }
+
+      .tech-info h3 {
+        font-family: "Orbitron", monospace;
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 25px;
+        color: var(--accent-purple);
+        text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+      }
+
+      .tech-info p {
+        line-height: 2;
+        font-family: "Courier Prime", monospace;
+        font-size: 1.1rem;
+      }
+
+      .tech-info strong {
+        color: var(--accent-blue);
+        font-weight: 700;
+      }
+
+      /* Pulse animation for the lock icon */
+      .pulse {
+        animation: pulseGlow 3s ease-in-out infinite;
+      }
+
+      @keyframes pulseGlow {
+        0%,
+        100% {
+          transform: scale(1);
+          text-shadow: 0 0 10px var(--accent-neon), 0 0 20px var(--accent-neon),
+            0 0 30px var(--accent-neon);
+        }
+        50% {
+          transform: scale(1.05);
+          text-shadow: 0 0 15px var(--accent-neon), 0 0 25px var(--accent-neon),
+            0 0 35px var(--accent-neon);
+        }
+      }
+
+      /* Terminal-style typing effect */
+      .typing-effect {
+        border-right: 3px solid var(--accent-neon);
+        animation: blink 1s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          border-color: var(--accent-neon);
+        }
+        51%,
+        100% {
+          border-color: transparent;
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px 15px;
+        }
+
+        .features-grid {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          margin-top: 40px;
+        }
+
+        .feature-card {
+          padding: 25px 20px;
+        }
+
+        .tech-info {
+          padding: 25px 20px;
+          margin-top: 40px;
+        }
+      }
+
+      /* Accessibility improvements */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        :root {
+          --text-primary: #ffffff;
+          --text-secondary: #ffffff;
+          --border-glow: #ffffff;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1 class="pulse">
+          🔐 <span th:text="${title}">CyberSecureX</span>
+        </h1>
+        <p style="font-size: 1.2rem" th:text="${message}">
+          Welcome to your Security Toolkit!
+        </p>
+        <!-- <div class="status">
+          <strong>✅ Spring Boot Application Successfully Running!</strong
+          ><br />
+          <small
+            >Java Security Toolkit • Port 8000 • Status:
+            <span style="color: var(--accent-neon)">ACTIVE</span></small
+          >
+        </div> -->
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>🔍 Website Scanner</h3>
+          <p>
+            Check for open ports & common vulnerabilities on any public website.
+            Analyze SSL certificates and security headers.
+          </p>
+          <a href="/scanner" class="btn">Start Scanning</a>
+        </div>
+
+        <div class="feature-card">
+          <h3>🖧 Network Discovery</h3>
+          <p>
+            Discover active devices on your local network, along with open ports
+            and services running on each device.
+          </p>
+          <a href="/network" class="btn">Scan Network</a>
+        </div>
+
+        <div class="feature-card">
+          <h3>🛡️ Password Checker</h3>
+          <p>
+            Evaluate password strength & check if it's been breached online
+            using HaveIBeenPwned database.
+          </p>
+          <a href="/password" class="btn">Check Password</a>
+        </div>
+
+        <div class="feature-card">
+          <h3>📁 Secure File Share</h3>
+          <p>
+            Upload files securely with expiry time, download limits, and
+            optional password protection.
+          </p>
+          <a href="/file-share" class="btn">Share Files</a>
+        </div>
+      </div>
+
+      <!-- <div class="tech-info">
+        <h3>🛠️ Technology Stack</h3>
+        <p>
+          <strong>Backend:</strong> Java 21 + Spring Boot 3.2 + Maven<br />
+          <strong>Database:</strong> SQLite with Hibernate<br />
+          <strong>Frontend:</strong> Thymeleaf + HTML5 + CSS3<br />
+          <strong>Security:</strong> Spring Security Integration Ready
+        </p>
+      </div> -->
+    </div>
+  </body>
+</html>
