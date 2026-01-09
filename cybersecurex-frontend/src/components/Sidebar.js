@@ -1,6 +1,22 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Sidebar() {
+  const location = useLocation();
+
+  const navItems = [
+    { path: "/", label: "🏠 Dashboard", activePath: "/" },
+    { path: "/scanner", label: "🔍 Website Scanner", activePath: "/scanner" },
+    { path: "/network", label: "🖧 Network Scanner", activePath: "/network" },
+    {
+      path: "/password",
+      label: "🛡️ Password Checker",
+      activePath: "/password",
+    },
+    { path: "/files", label: "📁 Secure File Share", activePath: "/files" },
+  ];
+
+  const isActive = (itemPath) => location.pathname === itemPath;
+
   return (
     <div
       style={{
@@ -30,95 +46,47 @@ export default function Sidebar() {
         >
           🔐 CyberSecureX
         </h3>
-        <p style={{ color: "#888", fontSize: "14px" }}>Security Toolkit</p>
+        <p style={{ color: "#888", fontSize: "14px" }}>Security Toolkit v2.0</p>
       </div>
 
       <nav style={{ listStyle: "none" }}>
-        <Link
-          to="/"
-          style={{
-            display: "block",
-            marginBottom: "1rem",
-            padding: "1.2rem",
-            background: "#00ff88",
-            color: "#000",
-            textDecoration: "none",
-            borderRadius: "12px",
-            fontWeight: "600",
-            boxShadow: "0 4px 15px rgba(0,255,136,0.3)",
-            transition: "all 0.3s ease",
-          }}
-        >
-          🏠 Dashboard
-        </Link>
-
-        <Link
-          to="/scanner"
-          style={{
-            display: "block",
-            marginBottom: "1rem",
-            padding: "1.2rem",
-            background: "transparent",
-            color: "#00ff88",
-            textDecoration: "none",
-            borderRadius: "12px",
-            border: "1px solid #00ff88",
-            transition: "all 0.3s ease",
-          }}
-        >
-          🔍 Website Scanner
-        </Link>
-
-        <Link
-          to="/network"
-          style={{
-            display: "block",
-            marginBottom: "1rem",
-            padding: "1.2rem",
-            background: "transparent",
-            color: "#00ff88",
-            textDecoration: "none",
-            borderRadius: "12px",
-            border: "1px solid #00ff88",
-            transition: "all 0.3s ease",
-          }}
-        >
-          🖧 Network Scanner
-        </Link>
-
-        <Link
-          to="/password"
-          style={{
-            display: "block",
-            marginBottom: "1rem",
-            padding: "1.2rem",
-            background: "transparent",
-            color: "#00ff88",
-            textDecoration: "none",
-            borderRadius: "12px",
-            border: "1px solid #00ff88",
-            transition: "all 0.3s ease",
-          }}
-        >
-          🛡️ Password Checker
-        </Link>
-
-        <Link
-          to="/files"
-          style={{
-            display: "block",
-            marginBottom: "1rem",
-            padding: "1.2rem",
-            background: "transparent",
-            color: "#00ff88",
-            textDecoration: "none",
-            borderRadius: "12px",
-            border: "1px solid #00ff88",
-            transition: "all 0.3s ease",
-          }}
-        >
-          📁 Secure File Share
-        </Link>
+        {navItems.map((item) => (
+          <Link
+            key={item.path}
+            to={item.path}
+            style={{
+              display: "block",
+              marginBottom: "1rem",
+              padding: "1.2rem",
+              background: isActive(item.activePath) ? "#00ff88" : "transparent",
+              color: isActive(item.activePath) ? "#000" : "#00ff88",
+              textDecoration: "none",
+              borderRadius: "12px",
+              border: `1px solid ${
+                isActive(item.activePath) ? "#00ff88" : "#00ff88"
+              }`,
+              transition: "all 0.3s ease",
+              fontWeight: isActive(item.activePath) ? "700" : "500",
+              boxShadow: isActive(item.activePath)
+                ? "0 4px 15px rgba(0,255,136,0.4)"
+                : "none",
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive(item.activePath)) {
+                e.currentTarget.style.background = "rgba(0,255,136,0.1)";
+                e.currentTarget.style.transform = "translateX(4px)";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive(item.activePath)) {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.transform = "translateX(0)";
+              }
+            }}
+          >
+            {item.label}
+          </Link>
+        ))}
       </nav>
     </div>
   );
