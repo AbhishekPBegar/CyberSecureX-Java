@@ -47,28 +47,63 @@ export default function FileAnalyzerPage() {
           <h1>📁 Malware & Threat Analyzer</h1>
           <p>Drag & drop files for instant security analysis</p>
         </div>
-
+        
         <div
           className={`drop-zone ${dragging ? "drag-active" : ""}`}
-          onDragOver={(e) => e.preventDefault()}
-          onDragLeave={() => setDragging(false)}
-          onDrop={handleDrop}
-          onDragEnter={() => setDragging(true)}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragging(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragging(false);
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setDragging(false);
+
+         
+            const droppedFiles = Array.from(e.dataTransfer.files).filter(
+              (file) => file.type !== "" && file.size > 0
+            );
+
+            if (droppedFiles.length > 0) {
+              setFiles((prev) => {
+                const newFiles = [...prev, ...droppedFiles];
+                return newFiles.slice(0, 10); 
+              });
+            }
+          }}
         >
           <div className="drop-content">
             <div className="drop-icon">📁</div>
-            <h3>Drag & drop files here</h3>
-            <p>or click to select files (max 10)</p>
+            <h3>{dragging ? "Drop files now!" : "Drag & drop files here"}</h3>
+            <p>or click to select (max 10 files: .exe, .zip, .pdf, .txt)</p>
             <input
               type="file"
               multiple
-              onChange={(e) => setFiles(Array.from(e.target.files))}
+              onChange={(e) => {
+                const selectedFiles = Array.from(e.target.files).slice(0, 10);
+                setFiles(selectedFiles);
+                e.target.value = ""; 
+              }}
               className="file-input"
               accept=".exe,.zip,.pdf,.docx,.txt"
+              style={{ display: "none" }}
+              id="file-upload"
             />
+            <label htmlFor="file-upload" className="file-input-label">
+              Choose Files
+            </label>
           </div>
         </div>
-
         {files.length > 0 && (
           <div className="files-preview">
             <h4>📋 Selected Files ({files.length})</h4>
@@ -96,7 +131,6 @@ export default function FileAnalyzerPage() {
             </button>
           </div>
         )}
-
         {result && (
           <div className="analysis-results">
             <h3>📊 Analysis Results</h3>
@@ -146,7 +180,6 @@ export default function FileAnalyzerPage() {
             )}
           </div>
         )}
-
         {result?.status === "error" && (
           <div className="error-card">
             <h3>❌ Analysis Failed</h3>
