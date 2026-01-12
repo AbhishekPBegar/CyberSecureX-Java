@@ -1,287 +1,342 @@
 import { useState } from "react";
+import PageLayout from "../components/PageLayout";
 
-export default function PasswordPage() {
+export default function PasswordCrackerPage() {
   const [password, setPassword] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const analyze = async () => {
-    if (!password) return;
+  const handleCrack = async () => {
+    if (!password.trim()) return;
     setLoading(true);
     setResult(null);
+
     try {
-      const params = new URLSearchParams({ password });
-      const res = await fetch("/api/password/analyze", {
+      const res = await fetch("/api/password/crack", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: params.toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: password.trim() }),
       });
       const data = await res.json();
       setResult(data);
     } catch (e) {
-      setResult({ status: "error", message: "Network error while analyzing" });
+      setResult({
+        strength: "error",
+        time: "N/A",
+        message: "Network error during analysis",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  const getScoreColor = (score) => {
-    if (score >= 75) return "#4CAF50"; // green
-    if (score >= 50) return "#FF9800"; // orange
-    if (score >= 25) return "#FF5722"; // red
-    return "#F44336"; // dark red
-  };
-
-  const getStrengthClass = (strength) => {
-    return `strength-${strength.toLowerCase().replace(/\s+/g, "-")}`;
-  };
-
-  if (result?.status === "error") {
-    return (
-      <main style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem" }}>
-        <h2>🛡️ Password Security Checker</h2>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter password to analyze"
-          style={{
-            width: "100%",
-            padding: "1rem",
-            borderRadius: "8px",
-            border: "none",
-            fontSize: "16px",
-            marginBottom: "1rem",
-          }}
-        />
-        <button
-          onClick={analyze}
-          disabled={loading}
-          style={{
-            padding: "1rem 2rem",
-            background: "#4CAF50",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Analyzing..." : "🔍 Analyze Password"}
-        </button>
-
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "2rem",
-            background: "#f44336",
-            borderRadius: "12px",
-            color: "white",
-          }}
-        >
-          <h3>❌ Analysis Error</h3>
-          <p>{result.message}</p>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <main style={{ maxWidth: "1000px", margin: "0 auto", padding: "2rem" }}>
-      <h2>🛡️ Password Security Checker</h2>
+    <PageLayout>
+      <div className="cracker-container">
+        <div className="cracker-header">
+          <h1>🔓 Password Strength Analyzer</h1>
+          <p>Test password security against modern cracking techniques</p>
+        </div>
 
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "2rem" }}>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Enter your password here..."
-          style={{
-            flex: 1,
-            padding: "1.2rem",
-            borderRadius: "12px",
-            border: "2px solid rgba(255,255,255,0.3)",
-            fontSize: "18px",
-            background: "rgba(255,255,255,0.9)",
-            color: "#333",
-          }}
-        />
-        <button
-          onClick={analyze}
-          disabled={loading}
-          style={{
-            padding: "1.2rem 2.5rem",
-            background: loading
-              ? "#666"
-              : "linear-gradient(135deg, #4CAF50, #45a049)",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
-            fontWeight: "bold",
-            boxShadow: "0 4px 15px rgba(76,175,80,0.3)",
-          }}
-        >
-          {loading ? "🔍 Analyzing..." : "🔍 Analyze Password"}
-        </button>
-      </div>
-
-      {result && (
-        <div
-          style={{
-            background: "rgba(255,255,255,0.1)",
-            padding: "2.5rem",
-            borderRadius: "20px",
-            backdropFilter: "blur(15px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-          }}
-        >
-          {/* Score Circle */}
-          <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-            <div
-              className={getStrengthClass(result.strength)}
-              style={{
-                width: "160px",
-                height: "160px",
-                borderRadius: "50%",
-                margin: "0 auto 1.5rem",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "32px",
-                fontWeight: "bold",
-                background: `linear-gradient(135deg, ${getScoreColor(
-                  result.score
-                )}, ${getScoreColor(result.score)})`,
-                boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
-              }}
-            >
-              {result.score}/100
-            </div>
-            <h2 style={{ color: "#FFD700", marginBottom: "0.5rem" }}>
-              {result.strength} Password
-            </h2>
-          </div>
-
-          {/* Breach Status */}
-          {result.breachInfo && (
-            <div
-              style={{
-                padding: "1.5rem",
-                borderRadius: "12px",
-                marginBottom: "1.5rem",
-                textAlign: "center",
-                background: result.breachInfo.breached
-                  ? "rgba(244,67,54,0.2)"
-                  : "rgba(76,175,80,0.2)",
-                border: `2px solid ${
-                  result.breachInfo.breached ? "#F44336" : "#4CAF50"
-                }`,
-              }}
-            >
-              <h3
-                style={{
-                  color: result.breachInfo.breached ? "#F44336" : "#4CAF50",
-                  marginBottom: "1rem",
-                }}
-              >
-                {result.breachInfo.breached ? "🚨 BREACHED" : "✅ SAFE"}
-              </h3>
-              <p style={{ fontSize: "16px", fontWeight: "500" }}>
-                {result.breachInfo.message}
-              </p>
-              {result.breachInfo.breached && result.breachInfo.count && (
-                <p style={{ fontSize: "14px", marginTop: "0.5rem" }}>
-                  Found in <strong>{result.breachInfo.count}</strong> data
-                  breaches
-                </p>
-              )}
-            </div>
-          )}
-
-          {/* Detailed Analysis */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-              gap: "1.5rem",
-            }}
+        <div className="cracker-input">
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter password to analyze..."
+            className="cracker-input-field"
+            maxLength={50}
+          />
+          <button
+            onClick={handleCrack}
+            disabled={loading || !password.trim()}
+            className="cracker-btn"
           >
-            {/* Analysis Card */}
-            {result.analysis && (
-              <div
-                style={{
-                  padding: "1.5rem",
-                  background: "rgba(255,255,255,0.05)",
-                  borderRadius: "12px",
-                }}
-              >
-                <h4 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-                  📊 Technical Analysis
-                </h4>
-                <div style={{ fontSize: "15px", lineHeight: "1.6" }}>
-                  <div>
-                    <strong>Length:</strong> {result.analysis.length} chars
-                  </div>
-                  <div>
-                    <strong>Unique chars:</strong> {result.analysis.uniqueChars}
-                  </div>
-                  <div>
-                    <strong>Entropy:</strong> {result.analysis.entropy} bits
-                  </div>
-                  <div>
-                    <strong>Lowercase:</strong>{" "}
-                    {result.analysis.hasLowercase ? "✅" : "❌"}
-                  </div>
-                  <div>
-                    <strong>Uppercase:</strong>{" "}
-                    {result.analysis.hasUppercase ? "✅" : "❌"}
-                  </div>
-                  <div>
-                    <strong>Numbers:</strong>{" "}
-                    {result.analysis.hasNumbers ? "✅" : "❌"}
-                  </div>
-                  <div>
-                    <strong>Special chars:</strong>{" "}
-                    {result.analysis.hasSpecialChars ? "✅" : "❌"}
-                  </div>
+            {loading ? "⚡ Analyzing..." : "💥 Test Strength"}
+          </button>
+        </div>
+
+        {result && (
+          <div className="cracker-results">
+            <div className="strength-meter">
+              <div className={`strength-bar ${result.strength}`}>
+                <div
+                  className="strength-fill"
+                  style={{
+                    width: `${getStrengthPercentage(result.strength)}%`,
+                  }}
+                />
+              </div>
+              <span className="strength-label">
+                {getStrengthText(result.strength)}
+              </span>
+            </div>
+
+            <div className="metrics-grid">
+              <div className="metric">
+                <span className="metric-label">Crack Time</span>
+                <span className="metric-value">{result.time || "N/A"}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">Length</span>
+                <span className="metric-value">{password.length}</span>
+              </div>
+              <div className="metric">
+                <span className="metric-label">Score</span>
+                <span className="metric-value">{result.score || 0}/100</span>
+              </div>
+            </div>
+
+            {result.recommendations && result.recommendations.length > 0 && (
+              <div className="recommendations">
+                <h4>🛠️ Recommendations</h4>
+                <div className="rec-grid">
+                  {result.recommendations.map((rec, i) => (
+                    <div key={i} className="rec-item">
+                      <span className="rec-icon">⚠️</span>
+                      <span>{rec}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
-
-            {/* Suggestions Card */}
-            {result.suggestions && (
-              <div
-                style={{
-                  padding: "1.5rem",
-                  background: "rgba(255,255,255,0.05)",
-                  borderRadius: "12px",
-                }}
-              >
-                <h4 style={{ color: "#FF9800", marginBottom: "1rem" }}>
-                  💡 Improvement Suggestions
-                </h4>
-                <ul style={{ listStyle: "none", padding: "0" }}>
-                  {result.suggestions.map((suggestion, i) => (
-                    <li
-                      key={i}
-                      style={{
-                        margin: "0.5rem 0",
-                        padding: "0.8rem",
-                        background: "rgba(255,152,0,0.2)",
-                        borderRadius: "8px",
-                        borderLeft: "4px solid #FF9800",
-                      }}
-                    >
-                      {suggestion}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
-        </div>
-      )}
-    </main>
+        )}
+
+        {result?.strength === "error" && (
+          <div className="error-card">
+            <h3>❌ Analysis Failed</h3>
+            <p>{result.message}</p>
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        .cracker-container {
+          max-width: 900px;
+          margin: 0 auto;
+          padding: 2rem 1rem;
+        }
+        .cracker-header h1 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+          background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .cracker-header p {
+          color: #9ca3af;
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
+        }
+        .cracker-input {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          flex-wrap: wrap;
+        }
+        .cracker-input-field {
+          flex: 1;
+          min-width: 300px;
+          padding: 1.2rem 1.5rem;
+          border: 2px solid #374151;
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          color: white;
+          font-size: 1.1rem;
+          font-family: monospace;
+          backdrop-filter: blur(10px);
+          letter-spacing: 1px;
+        }
+        .cracker-input-field::placeholder {
+          color: #9ca3af;
+          letter-spacing: 0;
+        }
+        .cracker-input-field:focus {
+          outline: none;
+          border-color: #ff6b6b;
+          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+        }
+        .cracker-btn {
+          padding: 1.2rem 2.5rem;
+          background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+          color: white;
+          border: none;
+          border-radius: 16px;
+          font-weight: 700;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+        .cracker-btn:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5);
+        }
+        .cracker-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .cracker-results {
+          animation: slideUp 0.5s ease;
+        }
+        .strength-meter {
+          margin: 2rem 0;
+          padding: 2rem;
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 20px;
+          text-align: center;
+        }
+        .strength-bar {
+          height: 20px;
+          border-radius: 10px;
+          overflow: hidden;
+          background: rgba(255, 255, 255, 0.1);
+          margin-bottom: 1rem;
+          position: relative;
+        }
+        .strength-fill {
+          height: 100%;
+          border-radius: 10px;
+          transition: width 1s ease;
+        }
+        .strength-label {
+          font-size: 1.5rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        .strength-weak .strength-fill {
+          background: #ef4444;
+        }
+        .strength-medium .strength-fill {
+          background: #f59e0b;
+        }
+        .strength-strong .strength-fill {
+          background: #10b981;
+        }
+        .strength-verystrong .strength-fill {
+          background: linear-gradient(90deg, #10b981, #059669);
+        }
+        .strength-weak .strength-label {
+          color: #ef4444;
+        }
+        .strength-medium .strength-label {
+          color: #f59e0b;
+        }
+        .strength-strong .strength-label {
+          color: #10b981;
+        }
+        .strength-verystrong .strength-label {
+          color: #059669;
+        }
+        .metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem 0;
+        }
+        .metric {
+          text-align: center;
+          padding: 1.5rem;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .metric-label {
+          display: block;
+          color: #9ca3af;
+          font-size: 0.85rem;
+          margin-bottom: 0.5rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .metric-value {
+          font-size: 1.4rem;
+          font-weight: 700;
+          font-family: monospace;
+        }
+        .recommendations {
+          margin-top: 2rem;
+          padding-top: 2rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .rec-grid {
+          display: grid;
+          gap: 1rem;
+        }
+        .rec-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 1rem;
+          padding: 1.5rem;
+          background: rgba(245, 158, 11, 0.1);
+          border-radius: 12px;
+          border-left: 4px solid #f59e0b;
+        }
+        .rec-icon {
+          font-size: 1.2rem;
+          margin-top: 0.2rem;
+        }
+        .error-card {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          color: #ef4444;
+        }
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @media (max-width: 768px) {
+          .cracker-container {
+            padding: 1rem;
+          }
+          .cracker-header h1 {
+            font-size: 2rem;
+          }
+          .cracker-input {
+            flex-direction: column;
+          }
+          .cracker-input-field {
+            min-width: auto;
+          }
+          .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+      `}</style>
+    </PageLayout>
   );
+}
+
+function getStrengthPercentage(strength) {
+  const percentages = {
+    weak: 25,
+    medium: 50,
+    strong: 75,
+    verystrong: 100,
+    error: 0,
+  };
+  return percentages[strength] || 0;
+}
+
+function getStrengthText(strength) {
+  const texts = {
+    weak: "WEAK",
+    medium: "MEDIUM",
+    strong: "STRONG",
+    verystrong: "VERY STRONG",
+    error: "ERROR",
+  };
+  return texts[strength] || "UNKNOWN";
 }
