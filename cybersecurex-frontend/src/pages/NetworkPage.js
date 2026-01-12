@@ -1,334 +1,331 @@
 import { useState } from "react";
+import PageLayout from "../components/PageLayout";
 
-export default function NetworkPage() {
+export default function NetworkScannerPage() {
+  const [target, setTarget] = useState("");
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const scan = async () => {
+  const handleScan = async () => {
+    if (!target.trim()) return;
     setLoading(true);
     setResult(null);
+
     try {
       const res = await fetch("/api/network/scan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ target: target.trim() }),
       });
       const data = await res.json();
       setResult(data);
     } catch (e) {
-      setResult({ status: "error", message: "Network scan failed" });
+      setResult({
+        status: "error",
+        message: "Network scan failed - check target IP/domain",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  if (result?.status === "error") {
-    return (
-      <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "2rem" }}>
-        <h2>🖧 Network Security Scanner</h2>
-        <button
-          onClick={scan}
-          disabled={loading}
-          style={{
-            padding: "1.2rem 3rem",
-            background: "linear-gradient(135deg, #4CAF50, #45a049)",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            fontSize: "18px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px rgba(76,175,80,0.3)",
-          }}
-        >
-          {loading ? "🔍 Scanning..." : "🚀 Start Network Scan"}
-        </button>
-
-        <div
-          style={{
-            marginTop: "2rem",
-            padding: "2rem",
-            background: "#f44336",
-            borderRadius: "12px",
-            color: "white",
-          }}
-        >
-          <h3>❌ Scan Error</h3>
-          <p>{result.message}</p>
-        </div>
-      </main>
-    );
-  }
-
   return (
-    <main style={{ maxWidth: "1400px", margin: "0 auto", padding: "2rem" }}>
-      <h2>🖧 Network Security Scanner</h2>
-      <p style={{ marginBottom: "1rem", color: "#FFD700" }}>
-        Discover devices on your local network and identify potential security
-        risks.
-      </p>
-      <button
-        onClick={scan}
-        disabled={loading}
-        style={{
-          padding: "1.2rem 3rem",
-          background: loading
-            ? "#666"
-            : "linear-gradient(135deg, #4CAF50, #45a049)",
-          color: "white",
-          border: "none",
-          borderRadius: "12px",
-          fontSize: "18px",
-          fontWeight: "bold",
-          cursor: loading ? "not-allowed" : "pointer",
-          boxShadow: "0 4px 15px rgba(76,175,80,0.3)",
-        }}
-      >
-        {loading ? "🔍 Scanning network..." : "🚀 Start Network Scan"}
-      </button>
+    <PageLayout>
+      <div className="network-container">
+        <div className="network-header">
+          <h1>🌐 Network Vulnerability Scanner</h1>
+          <p>Discover open ports, services & security risks</p>
+        </div>
 
-      {result && (
-        <div style={{ marginTop: "2rem" }}>
-          {/* Summary Card */}
-          <div
-            style={{
-              background: "rgba(255,255,255,0.1)",
-              padding: "2rem",
-              borderRadius: "16px",
-              backdropFilter: "blur(15px)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              textAlign: "center",
-              marginBottom: "2rem",
-            }}
+        <div className="network-input">
+          <input
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder="192.168.1.1 or example.com"
+            className="network-input-field"
+          />
+          <button
+            onClick={handleScan}
+            disabled={loading || !target.trim()}
+            className="network-btn"
           >
-            <h3 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-              📊 Network Scan Summary
-            </h3>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "1rem",
-              }}
-            >
-              <div
-                style={{
-                  padding: "1rem",
-                  background: "rgba(255,255,255,0.05)",
-                  borderRadius: "8px",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: "2rem",
-                    fontWeight: "bold",
-                    color: "#4CAF50",
-                  }}
-                >
-                  {result.deviceCount || 0}
+            {loading ? "🔍 Scanning..." : "⚡ Scan Network"}
+          </button>
+        </div>
+
+        {result && result.status !== "error" && (
+          <div className="network-results">
+            <div className="scan-summary">
+              <div className="summary-stats">
+                <div className="stat">
+                  <span className="stat-number">
+                    {result.openPorts?.length || 0}
+                  </span>
+                  <span className="stat-label">Open Ports</span>
                 </div>
-                <div>Active Devices</div>
+                <div className="stat">
+                  <span className="stat-number">
+                    {result.hosts?.length || 0}
+                  </span>
+                  <span className="stat-label">Live Hosts</span>
+                </div>
               </div>
-              {result.networkInfo && (
-                <>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      background: "rgba(255,255,255,0.05)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                      {result.networkInfo.localIP}
-                    </div>
-                    <div>Your IP</div>
-                  </div>
-                  <div
-                    style={{
-                      padding: "1rem",
-                      background: "rgba(255,255,255,0.05)",
-                      borderRadius: "8px",
-                    }}
-                  >
-                    <div style={{ fontSize: "1.2rem", fontWeight: "bold" }}>
-                      {result.networkInfo.subnet}
-                    </div>
-                    <div>Network Subnet</div>
-                  </div>
-                </>
-              )}
             </div>
-          </div>
 
-          {/* Devices Grid */}
-          {result.devices && result.devices.length > 0 ? (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
-                gap: "1.5rem",
-              }}
-            >
-              {result.devices.map((device, index) => (
-                <div
-                  key={device.ip || index}
-                  style={{
-                    background: "rgba(255,255,255,0.1)",
-                    padding: "1.5rem",
-                    borderRadius: "16px",
-                    backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255,255,255,0.2)",
-                    transition: "transform 0.3s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.transform = "translateY(-4px)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = "translateY(0)")
-                  }
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: "1rem",
-                    }}
-                  >
-                    <h4
-                      style={{
-                        fontSize: "1.4rem",
-                        color: "#FFD700",
-                        margin: 0,
-                      }}
-                    >
-                      {device.ip}
-                    </h4>
-                    <span
-                      style={{
-                        padding: "0.3rem 0.8rem",
-                        background: "#4CAF50",
-                        color: "white",
-                        borderRadius: "12px",
-                        fontSize: "12px",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {device.deviceType || "Unknown"}
-                    </span>
-                  </div>
-
-                  <div
-                    style={{
-                      marginBottom: "1rem",
-                      fontSize: "14px",
-                      color: "#ccc",
-                    }}
-                  >
-                    <div>
-                      <strong>Hostname:</strong> {device.hostname || "Unknown"}
-                    </div>
-                    <div>
-                      <strong>MAC:</strong> {device.macAddress || "Unknown"}
-                    </div>
-                    <div>
-                      <strong>Ports:</strong> {device.portCount || 0}
-                    </div>
-                  </div>
-
-                  {device.openPorts && device.openPorts.length > 0 && (
-                    <div style={{ marginBottom: "1rem" }}>
-                      <h5 style={{ color: "#FFD700", marginBottom: "0.8rem" }}>
-                        🔓 Open Ports
-                      </h5>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexWrap: "wrap",
-                          gap: "0.5rem",
-                        }}
-                      >
-                        {device.openPorts.slice(0, 8).map((port) => (
-                          <span
-                            key={port.port}
-                            style={{
-                              padding: "0.4rem 0.8rem",
-                              background:
-                                port.riskLevel === "HIGH"
-                                  ? "#F44336"
-                                  : port.riskLevel === "MEDIUM"
-                                  ? "#FF9800"
-                                  : "#4CAF50",
-                              color: "white",
-                              borderRadius: "16px",
-                              fontSize: "12px",
-                              fontWeight: "bold",
-                            }}
-                          >
-                            {port.port} ({port.service})
-                          </span>
-                        ))}
-                        {device.openPorts.length > 8 && (
-                          <span
-                            style={{
-                              padding: "0.4rem 0.8rem",
-                              background: "#666",
-                              color: "white",
-                              borderRadius: "16px",
-                              fontSize: "12px",
-                            }}
-                          >
-                            +{device.openPorts.length - 8} more
-                          </span>
-                        )}
+            {result.openPorts?.length > 0 && (
+              <div className="ports-section">
+                <h3>🔓 Open Ports & Services</h3>
+                <div className="ports-grid">
+                  {result.openPorts.map((port, i) => (
+                    <div key={i} className="port-card">
+                      <div className="port-number">{port.port}</div>
+                      <div className="port-service">
+                        {port.service || "Unknown"}
+                      </div>
+                      <div className={`port-risk ${port.risk || "low"}`}>
+                        {port.risk === "high"
+                          ? "HIGH"
+                          : port.risk === "medium"
+                          ? "MEDIUM"
+                          : "LOW"}
                       </div>
                     </div>
-                  )}
-
-                  {device.securityNotes && device.securityNotes.length > 0 && (
-                    <div>
-                      <h5 style={{ color: "#FF9800", marginBottom: "0.8rem" }}>
-                        🛡️ Security Notes
-                      </h5>
-                      {device.securityNotes.map((note, i) => (
-                        <div
-                          key={i}
-                          style={{
-                            padding: "0.8rem",
-                            margin: "0.3rem 0",
-                            background:
-                              note.includes("CRITICAL") || note.includes("HIGH")
-                                ? "rgba(244,67,54,0.2)"
-                                : note.includes("✅")
-                                ? "rgba(76,175,80,0.2)"
-                                : "rgba(255,152,0,0.2)",
-                            borderRadius: "8px",
-                            borderLeft: "4px solid",
-                            borderLeftColor:
-                              note.includes("CRITICAL") || note.includes("HIGH")
-                                ? "#F44336"
-                                : note.includes("✅")
-                                ? "#4CAF50"
-                                : "#FF9800",
-                          }}
-                        >
-                          {note}
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div style={{ textAlign: "center", padding: "4rem", opacity: 0.7 }}>
-              <h3>No devices found</h3>
-              <p>
-                This could be due to firewall settings or network configuration.
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-    </main>
+              </div>
+            )}
+
+            {result.vulnerabilities?.length > 0 && (
+              <div className="vuln-section">
+                <h3>⚠️ Detected Vulnerabilities</h3>
+                <div className="vuln-grid">
+                  {result.vulnerabilities.map((vuln, i) => (
+                    <div key={i} className="vuln-card">
+                      <span className="vuln-icon">🚨</span>
+                      <div>
+                        <h4>{vuln.title}</h4>
+                        <p>{vuln.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {result?.status === "error" && (
+          <div className="error-card">
+            <h3>❌ Scan Failed</h3>
+            <p>{result.message}</p>
+          </div>
+        )}
+      </div>
+
+      <style jsx>{`
+        .network-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2rem 1rem;
+        }
+        .network-header h1 {
+          font-size: 2.8rem;
+          margin-bottom: 0.5rem;
+          background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        .network-header p {
+          color: #9ca3af;
+          font-size: 1.1rem;
+          margin-bottom: 2rem;
+        }
+        .network-input {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          flex-wrap: wrap;
+        }
+        .network-input-field {
+          flex: 1;
+          min-width: 300px;
+          padding: 1.2rem 1.5rem;
+          border: 2px solid #374151;
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.05);
+          color: #00d4ff;
+          font-size: 1.1rem;
+          font-family: "Courier New", monospace;
+          backdrop-filter: blur(10px);
+        }
+        .network-input-field::placeholder {
+          color: #6b7280;
+        }
+        .network-input-field:focus {
+          outline: none;
+          border-color: #00d4ff;
+          box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2);
+        }
+        .network-btn {
+          padding: 1.2rem 2.5rem;
+          background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+          color: white;
+          border: none;
+          border-radius: 16px;
+          font-weight: 700;
+          font-size: 1.1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+        .network-btn:hover:not(:disabled) {
+          transform: translateY(-3px);
+          box-shadow: 0 15px 35px rgba(0, 212, 255, 0.4);
+        }
+        .network-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+        .scan-summary {
+          background: rgba(255, 255, 255, 0.08);
+          backdrop-filter: blur(20px);
+          border-radius: 20px;
+          padding: 2rem;
+          margin-bottom: 2rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .summary-stats {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 2rem;
+        }
+        .stat {
+          text-align: center;
+        }
+        .stat-number {
+          display: block;
+          font-size: 3rem;
+          font-weight: 800;
+          background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 0.5rem;
+        }
+        .stat-label {
+          color: #9ca3af;
+          font-size: 1rem;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .ports-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 1.5rem;
+        }
+        .port-card {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 16px;
+          padding: 1.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          transition: all 0.3s ease;
+        }
+        .port-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .port-number {
+          font-size: 2.5rem;
+          font-weight: 800;
+          color: #00d4ff;
+          margin-bottom: 0.5rem;
+          font-family: monospace;
+        }
+        .port-service {
+          color: #9ca3af;
+          margin-bottom: 1rem;
+          font-size: 1.1rem;
+        }
+        .port-risk {
+          padding: 0.5rem 1.5rem;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+        .port-risk.low {
+          background: rgba(34, 197, 94, 0.2);
+          color: #22c55e;
+        }
+        .port-risk.medium {
+          background: rgba(245, 158, 11, 0.2);
+          color: #f59e0b;
+        }
+        .port-risk.high {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+        }
+        .vuln-section {
+          margin-top: 2rem;
+          padding-top: 2rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .vuln-grid {
+          display: grid;
+          gap: 1.5rem;
+        }
+        .vuln-card {
+          display: flex;
+          gap: 1.5rem;
+          padding: 2rem;
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 16px;
+          backdrop-filter: blur(10px);
+        }
+        .vuln-icon {
+          font-size: 2rem;
+          margin-top: 0.2rem;
+        }
+        .vuln-card h4 {
+          margin: 0 0 0.5rem 0;
+          color: #ef4444;
+        }
+        .vuln-card p {
+          margin: 0;
+          color: #fca5a5;
+        }
+        .error-card {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.3);
+          border-radius: 16px;
+          padding: 2rem;
+          text-align: center;
+          color: #ef4444;
+        }
+        @media (max-width: 768px) {
+          .network-container {
+            padding: 1rem;
+          }
+          .network-header h1 {
+            font-size: 2.2rem;
+          }
+          .network-input {
+            flex-direction: column;
+          }
+          .ports-grid {
+            grid-template-columns: 1fr;
+          }
+          .summary-stats {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+    </PageLayout>
   );
 }
