@@ -3,81 +3,41 @@ export default function Home() {
     <div className="container">
       <h1>🔐 CyberSecureX</h1>
       <p style={{ fontSize: "1.2rem", marginBottom: "2rem", opacity: 0.9 }}>
-        Modern cybersecurity toolkit for personal and small business security.
+        Professional cybersecurity toolkit for vulnerability assessment and
+        security analysis.
       </p>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "2rem",
-          marginTop: "2rem",
-        }}
-      >
-        <div
-          style={{
-            padding: "2rem",
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-            🔍 Website Scanner
-          </h3>
+      <div className="card-grid">
+        <div className="security-card">
+          <h3>🔍 Website Scanner</h3>
           <p>
-            Check websites for open ports, SSL issues, and security headers.
+            Port scanning, SSL analysis, security headers, and vulnerability
+            detection.
           </p>
         </div>
 
-        <div
-          style={{
-            padding: "2rem",
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-            🛡️ Password Checker
-          </h3>
-          <p>Analyze strength and check against real breach databases.</p>
+        <div className="security-card">
+          <h3>🛡️ Password Checker</h3>
+          <p>
+            Strength analysis + real-time breach detection via HaveIBeenPwned
+            API.
+          </p>
         </div>
 
-        <div
-          style={{
-            padding: "2rem",
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-            🖧 Network Scanner
-          </h3>
-          <p>Discover devices and open ports on your local network.</p>
+        <div className="security-card">
+          <h3>🖧 Network Scanner</h3>
+          <p>
+            Device discovery, port mapping, service identification, risk
+            assessment.
+          </p>
         </div>
 
-        <div
-          style={{
-            padding: "2rem",
-            background: "rgba(255,255,255,0.1)",
-            borderRadius: "16px",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255,255,255,0.2)",
-            textAlign: "center",
-          }}
-        >
-          <h3 style={{ color: "#FFD700", marginBottom: "1rem" }}>
-            📁 Secure File Share
-          </h3>
-          <p>Share files securely with password protection and expiry.</p>
+        <div className="security-card">
+          <h3>📁 Secure File Share</h3>
+          <p>
+            Encrypted uploads, password protection, expiry controls, download
+            limits.
+          </p>
         </div>
       </div>
     </div>
